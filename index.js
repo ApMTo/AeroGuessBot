@@ -63,6 +63,15 @@ const checkGroup = async (chatId) => {
   }
 };
 
+bot.onText("/start", async (msg) => {
+  return bot.sendMessage(
+    chatId,
+    `Привет! 👋 Добро пожаловать в игру AeroGuess! 🎲 Готов к весёлым приключениям? Начни игру с командой /startgame. Удачи! 🍀\n\n` +
+      `Разработчик: @ApM_To 💻\n` +
+      `Если возникнут вопросы, обращайтесь ко мне в Telegram!`
+  );
+});
+
 bot.onText(/\/startgame/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
@@ -174,6 +183,7 @@ bot.onText("/cancelgame", async (msg) => {
 bot.setMyCommands([
   { command: "/startgame", description: "Начать игру" },
   { command: "/cancelgame", description: "Завершить игру" },
+  { command: "/start", description: "Приветствие" },
 ]);
 
 const port = process.env.PORT || 3000;
