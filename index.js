@@ -13,12 +13,9 @@ let currentPlayerName = "";
 let gameActive = false;
 let isCanceled = false;
 let gameTimeout = null;
-
-
+let timer = null; // Добавим таймер для отсчета времени
 
 app.use(bodyParser.json());
-
-
 
 const checkAdminRights = async (chatId) => {
   try {
@@ -73,7 +70,6 @@ bot.onText(/\/start/, async (msg) => {
   }
 });
 
-
 bot.onText(/\/startgame/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
@@ -97,6 +93,13 @@ bot.onText(/\/startgame/, async (msg) => {
   currentPlayerName = userName;
   currentWord = words[Math.floor(Math.random() * words.length)];
   gameActive = true;
+
+ 
+  timer = setTimeout(() => {
+    if(isCanceled) return;
+    bot.sendMessage(chatId, "⏰ Время вышло! Игра обнуляется.");
+    resetGame(chatId);
+  }, 90 * 1000); 
 
   bot.sendMessage(
     chatId,
@@ -163,6 +166,13 @@ bot.on("message", (msg) => {
         ],
       },
     });
+
+  
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      bot.sendMessage(chatId, "⏰ Время вышло! Игра обнуляется.");
+      resetGame(chatId);
+    }, 90 * 1000);
   }
 });
 
@@ -174,13 +184,18 @@ bot.onText("/cancelgame", async (msg) => {
     return checkGroupAndRole.message;
   }
 
-  currentWord = false;
+  resetGame(chatId);
+  return bot.sendMessage(chatId, "🔴 Игра завершена!");
+});
+
+const resetGame = (chatId) => {
+  currentWord = "";
   currentPlayerId = null;
   currentPlayerName = "";
   gameActive = false;
   isCanceled = true;
-  return bot.sendMessage(chatId, "🔴 Игра завершена!");
-});
+  clearTimeout(timer); 
+};
 
 bot.setMyCommands([
   { command: "/startgame", description: "Начать игру" },
