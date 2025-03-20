@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const bodyParser = require("body-parser");
+const fetch = require("node-fetch");
 const TelegramApi = require("node-telegram-bot-api");
 const words = require("./words.js");
 const token = process.env.TELEGRAM_TOKEN;
@@ -210,6 +211,19 @@ app.post("/webhook", (req, res) => {
   bot.processUpdate(update);
   res.sendStatus(200);
 });
+
+// Keep-alive endpoint
+app.get("/ping", (req, res) => {
+  res.send("Server is alive");
+});
+
+
+setInterval(() => {
+  fetch(`${process.env.SERVER_LINK}/ping`)
+    .then((res) => res.text())
+    .then((data) => console.log(`Keep-alive: ${data}`))
+    .catch((err) => console.error(`Keep-alive error: ${err}`));
+}, 9 * 60 * 1000); 
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
