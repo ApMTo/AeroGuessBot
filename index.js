@@ -13,7 +13,7 @@ let currentPlayerName = "";
 let gameActive = false;
 let isCanceled = false;
 let gameTimeout = null;
-let timer = null; // Добавим таймер для отсчета времени
+let timer = null;
 
 app.use(bodyParser.json());
 
