@@ -97,7 +97,7 @@ bot.onText(/\/startgame/, async (msg) => {
   timer = setTimeout(() => {
     bot.sendMessage(chatId, "⏰ Время вышло! Игра обнуляется.");
     resetGame(chatId);
-  }, 90 * 1000);
+  }, 300 * 1000);
 
   bot.sendMessage(
     chatId,
