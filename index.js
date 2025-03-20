@@ -94,12 +94,10 @@ bot.onText(/\/startgame/, async (msg) => {
   currentWord = words[Math.floor(Math.random() * words.length)];
   gameActive = true;
 
- 
   timer = setTimeout(() => {
-    if(isCanceled) return;
     bot.sendMessage(chatId, "⏰ Время вышло! Игра обнуляется.");
     resetGame(chatId);
-  }, 90 * 1000); 
+  }, 90 * 1000);
 
   bot.sendMessage(
     chatId,
@@ -167,7 +165,6 @@ bot.on("message", (msg) => {
       },
     });
 
-  
     clearTimeout(timer);
     timer = setTimeout(() => {
       bot.sendMessage(chatId, "⏰ Время вышло! Игра обнуляется.");
@@ -183,6 +180,9 @@ bot.onText("/cancelgame", async (msg) => {
   if (checkGroupAndRole?.status === false) {
     return checkGroupAndRole.message;
   }
+  if(!gameActive || isCanceled) {
+    return bot.sendMessage(chatId, "🔴 Игра не начата!");
+  }
 
   resetGame(chatId);
   return bot.sendMessage(chatId, "🔴 Игра завершена!");
@@ -194,7 +194,7 @@ const resetGame = (chatId) => {
   currentPlayerName = "";
   gameActive = false;
   isCanceled = true;
-  clearTimeout(timer); 
+  clearTimeout(timer);
 };
 
 bot.setMyCommands([
