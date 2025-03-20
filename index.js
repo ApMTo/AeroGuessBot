@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const words = require("./words.js");
 const token = "8107670110:AAGnwpvqQiN9py9mab1aRvj8TFhBB8OHGpk";
-const bot = new TelegramApi(token);
+const bot = new TelegramApi(token, { polling: true });
 const app = express();
 
 let currentWord = "";
@@ -14,7 +14,7 @@ let gameActive = false;
 let isCanceled = false;
 let gameTimeout = null;
 
-bot.setWebHook(process.env.SERVER_LINK);
+
 
 app.use(bodyParser.json());
 
