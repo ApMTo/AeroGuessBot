@@ -18,11 +18,7 @@ let gameTimeout = null;
 
 app.use(bodyParser.json());
 
-app.post("/webhook", (req, res) => {
-  const update = req.body;
-  bot.processUpdate(update);
-  res.sendStatus(200);
-});
+
 
 const checkAdminRights = async (chatId) => {
   try {
@@ -63,15 +59,20 @@ const checkGroup = async (chatId) => {
   }
 };
 
-bot.onText("/start", async (msg) => {
+bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
-  return bot.sendMessage(
-    chatId,
-    `Привет! 👋 Добро пожаловать в игру AeroGuess! 🎲 Готов к весёлым приключениям? Начни игру с командой /startgame. Удачи! 🍀\n\n` +
-      `Разработчик: @ApM_To 💻\n` +
-      `Если возникнут вопросы, обращайтесь ко мне в Telegram!`
-  );
+  const userId = msg.from.id;
+
+  if (msg.text === "/start" && !gameActive) {
+    return bot.sendMessage(
+      chatId,
+      `Привет! 👋 Добро пожаловать в игру AeroGuess! 🎲 Готов к весёлым приключениям? Начни игру с командой /startgame. Удачи! 🍀\n\n` +
+        `Разработчик: @ApM_To 💻\n` +
+        `Если возникнут вопросы, обращайтесь ко мне в Telegram!`
+    );
+  }
 });
+
 
 bot.onText(/\/startgame/, async (msg) => {
   const chatId = msg.chat.id;
