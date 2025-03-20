@@ -1,9 +1,10 @@
 const express = require("express");
+require("dotenv").config();
 const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const words = require("./words.js");
 const token = "8107670110:AAGnwpvqQiN9py9mab1aRvj8TFhBB8OHGpk";
-const bot = new TelegramApi(token, {polling: true});
+const bot = new TelegramApi(token);
 const app = express();
 
 let currentWord = "";
@@ -13,8 +14,7 @@ let gameActive = false;
 let isCanceled = false;
 let gameTimeout = null;
 
-// const url = "https://your-server.com/webhook";
-// bot.setWebHook(url);
+bot.setWebHook(process.env.SERVER_LINK);
 
 app.use(bodyParser.json());
 
@@ -78,7 +78,6 @@ bot.onText(/\/startgame/, async (msg) => {
     return bot.sendMessage(chatId, "🟡 Игра уже идёт!");
   }
 
-  
   if (gameTimeout) {
     clearTimeout(gameTimeout);
   }
