@@ -144,7 +144,7 @@ bot.on("message", (msg) => {
   if (text === currentWord.toLowerCase()) {
     bot.sendMessage(
       chatId,
-      `🎉 *${userName} угадал слово!* Это было: *${currentWord}*`,
+      `🎉 *${userName} угадал(а) слово!* Это было: *${currentWord}*`,
       {
         parse_mode: "Markdown",
       }
