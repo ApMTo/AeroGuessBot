@@ -64,6 +64,7 @@ const checkGroup = async (chatId) => {
 };
 
 bot.onText("/start", async (msg) => {
+  const chatId = msg.chat.id;
   return bot.sendMessage(
     chatId,
     `Привет! 👋 Добро пожаловать в игру AeroGuess! 🎲 Готов к весёлым приключениям? Начни игру с командой /startgame. Удачи! 🍀\n\n` +
