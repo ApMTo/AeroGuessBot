@@ -3,8 +3,8 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const words = require("./words.js");
-const token = process.env.TELEGRAM_TOKEN; 
-const bot = new TelegramApi(token, { polling: false }); 
+const token = process.env.TELEGRAM_TOKEN;
+const bot = new TelegramApi(token, { polling: false });
 const app = express();
 
 let currentWord = "";
@@ -162,14 +162,14 @@ bot.on("message", (msg) => {
         inline_keyboard: [
           [{ text: "👀 Показать слово", callback_data: "show_word" }],
         ],
-      },
+      ],
     });
 
     clearTimeout(timer);
     timer = setTimeout(() => {
       bot.sendMessage(chatId, "⏰ Время вышло! Игра обнуляется.");
       resetGame(chatId);
-    }, 90 * 1000);
+    }, 300 * 1000);
   }
 });
 
@@ -207,8 +207,8 @@ bot.setWebHook(`${process.env.SERVER_LINK}/webhook`);
 
 app.post("/webhook", (req, res) => {
   const update = req.body;
-  bot.processUpdate(update); 
-  res.sendStatus(200); 
+  bot.processUpdate(update);
+  res.sendStatus(200);
 });
 
 const port = process.env.PORT || 3000;
