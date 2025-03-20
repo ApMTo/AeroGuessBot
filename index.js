@@ -110,9 +110,9 @@ bot.onText(/\/startgame/, async (msg) => {
   bot.sendMessage(chatId, "🔒 Нажми, чтобы увидеть слово!", {
     reply_markup: {
       inline_keyboard: [
-        [{ text: "👀 Показать слово", callback_data: "show_word" }],
-      ],
-    },
+        [{ text: "👀 Показать слово", callback_data: "show_word" }]
+      ]
+    }
   });
 });
 
@@ -160,9 +160,9 @@ bot.on("message", (msg) => {
     bot.sendMessage(chatId, "🔒 Нажми, чтобы увидеть слово!", {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "👀 Показать слово", callback_data: "show_word" }],
-        ],
-      ],
+          [{ text: "👀 Показать слово", callback_data: "show_word" }]
+        ]
+      }
     });
 
     clearTimeout(timer);
