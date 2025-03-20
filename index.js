@@ -3,8 +3,8 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const words = require("./words.js");
-const token = "8107670110:AAGnwpvqQiN9py9mab1aRvj8TFhBB8OHGpk";
-const bot = new TelegramApi(token, { polling: true });
+const token = process.env.TELEGRAM_TOKEN; 
+const bot = new TelegramApi(token, { polling: false }); 
 const app = express();
 
 let currentWord = "";
@@ -144,7 +144,7 @@ bot.on("message", (msg) => {
   if (text === currentWord.toLowerCase()) {
     bot.sendMessage(
       chatId,
-      `🎉 *${userName} угадал(а) слово!* Это было: *${currentWord}*`,
+      `🎉 *${userName} угадал слово!* Это было: *${currentWord}*`,
       {
         parse_mode: "Markdown",
       }
@@ -180,7 +180,7 @@ bot.onText("/cancelgame", async (msg) => {
   if (checkGroupAndRole?.status === false) {
     return checkGroupAndRole.message;
   }
-  if(!gameActive || isCanceled) {
+  if (!gameActive || isCanceled) {
     return bot.sendMessage(chatId, "🔴 Игра не начата!");
   }
 
@@ -202,6 +202,14 @@ bot.setMyCommands([
   { command: "/cancelgame", description: "Завершить игру" },
   { command: "/start", description: "Приветствие" },
 ]);
+
+bot.setWebHook(`${process.env.SERVER_LINK}/webhook`);
+
+app.post("/webhook", (req, res) => {
+  const update = req.body;
+  bot.processUpdate(update); 
+  res.sendStatus(200); 
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
