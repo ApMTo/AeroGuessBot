@@ -61,19 +61,19 @@ bot.onText(/\/start/, async (msg) => {
   const userId = msg.from.id;
 
   if (msg.text === "/start" && !gameActive) {
-   return bot.sendMessage(
-  chatId,
-  `Привет! 👋 Добро пожаловать в игру AeroGuess! 🎲 Готов к весёлым приключениям? Начни игру с командой /startgame. Удачи! 🍀\n\n` +
-    `### Инструкция по игре:\n` +
-    `1. Добавь бота в свой Telegram-групповой чат.\n` +
-    `2. Начни игру командой /startgame.\n` +
-    `3. Один игрок получает секретное слово и должен объяснить его, не называя напрямую.\n` +
-    `4. Остальные игроки должны угадать слово в чате.\n` +
-    `5. Первый, кто угадает правильно, становится новым объясняющим.\n` +
-    `6. Игра заканчивается, когда ты используешь команду /cancelgame.\n\n` +
-    `Разработчик: @ApM_To 💻\n` +
-    `Если возникнут вопросы, обращайтесь ко мне в Telegram!`
-);
+    return bot.sendMessage(
+      chatId,
+      `Привет! 👋 Добро пожаловать в игру AeroGuess! 🎲 Готов к весёлым приключениям? Начни игру с командой /startgame. Удачи! 🍀\n\n` +
+        `### Инструкция по игре:\n` +
+        `1. Добавь бота в свой Telegram-групповой чат.\n` +
+        `2. Начни игру командой /startgame.\n` +
+        `3. Один игрок получает секретное слово и должен объяснить его, не называя напрямую.\n` +
+        `4. Остальные игроки должны угадать слово в чате.\n` +
+        `5. Первый, кто угадает правильно, становится новым объясняющим.\n` +
+        `6. Игра заканчивается, когда ты используешь команду /cancelgame.\n\n` +
+        `Разработчик: @ApM_To 💻\n` +
+        `Если возникнут вопросы, обращайтесь ко мне в Telegram!`
+    );
   }
 });
 
@@ -149,16 +149,32 @@ bot.on("callback_query", (query) => {
   }
 });
 
-
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text?.toLowerCase();
   const userId = msg.from.id;
   const userName = msg.from.first_name;
 
-  if (!gameActive || !currentWord || userId === currentPlayerId) return;
+  const replyText = msg.reply_to_message?.text?.toLowerCase();
 
-  if (text === currentWord.toLowerCase()) {
+  if (!gameActive || !currentWord) return;
+
+  if (
+    (text === currentWord.toLowerCase() ||
+      replyText === currentWord.toLowerCase()) &&
+    userId === currentPlayerId
+  ) {
+    resetGame(chatId);
+    return bot.sendMessage(
+      chatId,
+      "🔴 В связи с тем, что ведущий озвучил загаданное слово, игра завершается!"
+    );
+  }
+
+  if (
+    text === currentWord.toLowerCase() ||
+    replyText === currentWord.toLowerCase()
+  ) {
     bot.sendMessage(
       chatId,
       `🎉 *${userName} угадал(а) слово!* Это было: *${currentWord}*`,
@@ -206,7 +222,7 @@ bot.onText("/cancelgame", async (msg) => {
   return bot.sendMessage(chatId, "🔴 Игра завершена!");
 });
 
-const resetGame = (chatId) => {
+const resetGame = () => {
   currentWord = "";
   currentPlayerId = null;
   currentPlayerName = "";
@@ -228,7 +244,7 @@ app.post("/webhook", (req, res) => {
   bot.processUpdate(update);
   res.sendStatus(200);
 });
-
+ 
 app.get("/ping", (req, res) => {
   res.send("Server is alive");
 });
