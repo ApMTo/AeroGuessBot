@@ -110,9 +110,10 @@ bot.onText(/\/startgame/, async (msg) => {
   bot.sendMessage(chatId, "🔒 Нажми, чтобы увидеть слово!", {
     reply_markup: {
       inline_keyboard: [
-        [{ text: "👀 Показать слово", callback_data: "show_word" }]
-      ]
-    }
+        [{ text: "👀 Показать слово", callback_data: "show_word" }],
+        [{ text: "🔄 Сменить слово", callback_data: "change_word" }],
+      ],
+    },
   });
 });
 
@@ -127,11 +128,20 @@ bot.on("callback_query", (query) => {
     });
   }
 
-  bot.answerCallbackQuery(query.id, {
-    text: `🤫 Твоё слово: ${currentWord}\nОбъясни его, но не называй напрямую!`,
-    show_alert: true,
-  });
+  if (query.data === "show_word") {
+    bot.answerCallbackQuery(query.id, {
+      text: `🤫 Твоё слово: ${currentWord}\nОбъясни его, но не называй напрямую!`,
+      show_alert: true,
+    });
+  } else if (query.data === "change_word") {
+    currentWord = words[Math.floor(Math.random() * words.length)];
+    bot.answerCallbackQuery(query.id, {
+      text: "✅ Слово изменено! Твоё новое слово: " + currentWord,
+      show_alert: true,
+    });
+  }
 });
+
 
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
@@ -160,9 +170,10 @@ bot.on("message", (msg) => {
     bot.sendMessage(chatId, "🔒 Нажми, чтобы увидеть слово!", {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "👀 Показать слово", callback_data: "show_word" }]
-        ]
-      }
+          [{ text: "👀 Показать слово", callback_data: "show_word" }],
+          [{ text: "🔄 Сменить слово", callback_data: "change_word" }],
+        ],
+      },
     });
 
     clearTimeout(timer);
@@ -211,18 +222,16 @@ app.post("/webhook", (req, res) => {
   res.sendStatus(200);
 });
 
-// Keep-alive endpoint
 app.get("/ping", (req, res) => {
   res.send("Server is alive");
 });
-
 
 setInterval(() => {
   fetch(`${process.env.SERVER_LINK}/ping`)
     .then((res) => res.text())
     .then((data) => console.log(`Keep-alive: ${data}`))
     .catch((err) => console.error(`Keep-alive error: ${err}`));
-}, 9 * 60 * 1000); 
+}, 9 * 60 * 1000);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
