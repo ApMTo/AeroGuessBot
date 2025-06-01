@@ -3,7 +3,6 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const words = require("./words.js");
-const { generateGuessWordText } = require("./utils/utils.js");
 const token = process.env.TELEGRAM_TOKEN;
 const bot = new TelegramApi(token, { polling: false });
 const app = express();
@@ -60,7 +59,7 @@ const checkGroup = async (chatId) => {
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
 
-  if (msg.text === "/start" && !selected[chatId]) {
+  if (msg.text === "/start") {
     return bot.sendMessage(
       chatId,
       `Привет! 👋 Добро пожаловать в **AeroGuess Games**! 🎮
@@ -124,10 +123,18 @@ bot.onText(/\/rules/, (msg) => {
 bot.on("callback_query", (callbackQuery) => {
   const chatId = callbackQuery.message.chat.id;
   const { data } = callbackQuery;
-
   let gameRules;
   if (data === "word_game") {
-    gameRules = generateGuessWordText();
+    gameRules = `🧠 Правила игры AeroGuess:
+
+1️⃣ Добавь бота в групповой чат Telegram.  
+2️⃣ Используй команду /startgame для начала игры.  
+3️⃣ Один из игроков получает секретное слово. Его задача — объяснить его остальным, не называя напрямую.  
+4️⃣ Остальные игроки пытаются угадать слово в чате.  
+5️⃣ Тот, кто угадает первым, становится новым объясняющим.  
+6️⃣ Игра продолжается, пока не будет введена команда /cancelgame.  
+
+🎉 Это отличная игра для компании друзей, где важны скорость, смекалка и чувство юмора!`;
     bot.deleteMessage(chatId, callbackQuery.message.message_id);
   }
 
@@ -319,6 +326,7 @@ bot.setMyCommands([
   { command: "/startgame", description: "Начать игру" },
   { command: "/cancelgame", description: "Завершить игру" },
   { command: "/start", description: "Приветствие" },
+  { command: "/rulest", description: "Правила игры" },
 ]);
 
 bot.setWebHook(`${process.env.SERVER_LINK}/webhook`);
