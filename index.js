@@ -3,6 +3,7 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const words = require("./words.js");
+const { generateGuessWordText } = require("./utils/utils.js");
 const token = process.env.TELEGRAM_TOKEN;
 const bot = new TelegramApi(token, { polling: false });
 const app = express();
@@ -58,22 +59,105 @@ const checkGroup = async (chatId) => {
 
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
-  const userId = msg.from.id;
 
-  if (msg.text === "/start" && !gameActive) {
+  if (msg.text === "/start" && !selected[chatId]) {
     return bot.sendMessage(
       chatId,
-      `Привет! 👋 Добро пожаловать в игру AeroGuess! 🎲 Готов к весёлым приключениям? Начни игру с командой /startgame. Удачи! 🍀\n\n` +
-        `### Инструкция по игре:\n` +
-        `1. Добавь бота в свой Telegram-групповой чат.\n` +
-        `2. Начни игру командой /startgame.\n` +
-        `3. Один игрок получает секретное слово и должен объяснить его, не называя напрямую.\n` +
-        `4. Остальные игроки должны угадать слово в чате.\n` +
-        `5. Первый, кто угадает правильно, становится новым объясняющим.\n` +
-        `6. Игра заканчивается, когда ты используешь команду /cancelgame.\n\n` +
-        `Разработчик: @ApM_To 💻\n` +
-        `Если возникнут вопросы, обращайтесь ко мне в Telegram!`
+      `Привет! 👋 Добро пожаловать в **AeroGuess Games**! 🎮
+      
+    Здесь тебя ждёт много весёлых и умных игр с друзьями в чате! 😄  
+    Готов начать? Просто добавь бота в групповой чат и выбери игру!  
+      
+    🔥 **Доступные игры**:  
+    - **AeroGuess** 🧠 — угадай слово по объяснению  
+      
+    ✨ **Команды для начала игры**:  
+    /startgame — Начать игру "Игру в слова"
+    /cancelgame — Закончить игру  
+    /rules — Правила игры
+      
+    📩 **Если возникнут вопросы** — пиши мне в Telegram! [@ApM_To](https://t.me/ApM_To)  
+    👾 **Телеграм-канал**: [https://t.me/aeroguessclub](https://t.me/aeroguessclub)  
+      
+    💬 **Написать в поддержку**: [@ApM_To](https://t.me/ApM_To)  
+    📢 **Подписаться на канал**: [AeroGuess Club](https://t.me/aeroguessclub)`,
+      {
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "💬 Написать в поддержку",
+                url: "https://t.me/ApM_To",
+              },
+            ],
+            [
+              {
+                text: "📢 Подписаться на канал",
+                url: "https://t.me/aeroguessclub",
+              },
+            ],
+          ],
+        },
+      }
     );
+  }
+});
+
+bot.onText(/\/rules/, (msg) => {
+  const chatId = msg.chat.id;
+
+  bot.sendMessage(chatId, "Выберите игру:", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "Игра в слова",
+            callback_data: "word_game",
+          },
+        ],
+      ],
+    },
+  });
+});
+
+bot.on("callback_query", (callbackQuery) => {
+  const chatId = callbackQuery.message.chat.id;
+  const { data } = callbackQuery;
+
+  let gameRules;
+  if (data === "word_game") {
+    gameRules = generateGuessWordText();
+    bot.deleteMessage(chatId, callbackQuery.message.message_id);
+  }
+
+  bot.sendMessage(chatId, gameRules, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "Вернуться в меню", callback_data: "back_to_menu" }],
+      ],
+    },
+  });
+});
+
+bot.on("callback_query", (callbackQuery) => {
+  const chatId = callbackQuery.message.chat.id;
+  const { data } = callbackQuery;
+
+  if (data === "back_to_menu") {
+    bot.deleteMessage(chatId, callbackQuery.message.message_id);
+    bot.sendMessage(chatId, "Выберите игру:", {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Игра в слова",
+              callback_data: "word_game",
+            },
+          ],
+        ],
+      },
+    });
   }
 });
 
